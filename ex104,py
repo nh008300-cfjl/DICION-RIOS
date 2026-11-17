@@ -1,0 +1,16 @@
+
+dados = []
+
+
+
+
+
+
+
+dados = {}
+# Dentro de um laço (for/while):
+dados[estado] = percentual
+
+# Para percorrer:
+for estado, percentual in dados.items():
+    print(f"{estado}: {percentual}%")
