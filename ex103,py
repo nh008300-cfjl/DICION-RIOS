@@ -1,0 +1,56 @@
+import csv
+
+
+def carregar_moedas(nome_arquivo):
+    moedas = {}
+    with open(nome_arquivo, mode='r', encoding='utf-8') as arquivo:
+       
+        primeira_linha = arquivo.readline()
+        separador = ';' if ';' in primeira_linha else ','
+        arquivo.seek(0)
+
+        leitor = csv.reader(arquivo, delimiter=separador)
+        next(leitor, None)  # Pula o cabeçalho (ex: moeda,cotacao)
+
+        for linha in leitor:
+            if len(linha) >= 2:
+                nome_moeda = linha[0].strip()
+                # Converte vírgula decimal para ponto, se necessário
+                cotacao = float(linha[1].strip().replace(',', '.'))
+                # Salva usando a chave em maiúsculo para facilitar a busca
+                moedas[nome_moeda.upper()] = {
+                    'nome': nome_moeda,
+                    'cotacao': cotacao,
+                }
+    return moedas
+
+
+
+try:
+    tabela_moedas = carregar_moedas('moedas.csv')
+
+    print('Moedas disponíveis para conversão:')
+    for dados in tabela_moedas.values():
+        print(f"- {dados['nome']} (Cotação: R$ {dados['cotacao']:.2f})")
+
+    print('-' * 40)
+    valor_reais = float(
+        input('Digite o valor em R$ que deseja converter: ').replace(',', '.')
+    )
+    destino = input('Digite o nome da moeda de destino: ').strip().upper()
+
+    if destino in tabela_moedas:
+        moeda_escolhida = tabela_moedas[destino]
+        valor_convertido = valor_reais / moeda_escolhida['cotacao']
+        print('-' * 40)
+        print(f"Moeda de destino: {moeda_escolhida['nome']}")
+        print(f'Valor convertido: {valor_convertido:.2f}')
+    else:
+        print('Erro: Moeda não encontrada no arquivo moedas.csv.')
+
+except FileNotFoundError:
+    print(
+        'Erro: O arquivo "moedas.csv" não foi encontrado na pasta do programa.'
+    )
+except ValueError:
+    print('Erro: Digite um valor numérico válido.')
